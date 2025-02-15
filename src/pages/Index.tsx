@@ -13,6 +13,7 @@ const Index = () => {
   const [cloudTransparency, setCloudTransparency] = useState(0.5);
   const [swampTransparency, setSwampTransparency] = useState(1);
   const [bushTransparency, setBushTransparency] = useState(1);
+  const [viewDirection, setViewDirection] = useState('normal');
 
   useEffect(() => {
     // Enable echolocation
@@ -60,10 +61,37 @@ const Index = () => {
         setShowMenu(prev => !prev);
       } else if (event.key.toLowerCase() === 'c') {
         setShowEnemyLines(prev => !prev);
+      } else if (event.key.toLowerCase() === 'y') {
+        setShowMenu(prev => !prev);
       }
     };
 
     document.addEventListener('keydown', handleKeyPress);
+
+    // View direction handler
+    const updateViewDirection = () => {
+      // @ts-ignore - game is a global variable
+      if (typeof window.game !== 'undefined' && window.game.me) {
+        const offset = viewDirection === 'normal' ? 0 : 200;
+        // @ts-ignore
+        window.game.me.getAllPositions = function() {
+          return {
+            x: this.position.x,
+            y: this.position.y,
+            center: {
+              x: this.position.x + this.width + (viewDirection === 'right' ? offset : viewDirection === 'left' ? -offset : 0),
+              y: this.position.y + this.height + (viewDirection === 'top' ? offset : viewDirection === 'bottom' ? -offset : 0)
+            },
+            right: this.position.x + this.width,
+            left: this.position.x,
+            top: this.position.y + this.height,
+            bottom: this.position.y
+          };
+        };
+      }
+    };
+
+    const viewInterval = setInterval(updateViewDirection, 100);
 
     // Apply transparency effects
     const applyTransparency = () => {
@@ -89,9 +117,14 @@ const Index = () => {
       clearInterval(echolocationInterval);
       clearInterval(bossTimerInterval);
       clearInterval(transparencyInterval);
+      clearInterval(viewInterval);
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, [cloudTransparency, swampTransparency, bushTransparency]);
+  }, [cloudTransparency, swampTransparency, bushTransparency, viewDirection]);
+
+  const handleViewChange = (newDirection: string) => {
+    setViewDirection(newDirection);
+  };
 
   return (
     <>
@@ -146,6 +179,22 @@ const Index = () => {
                 checked={emoteSpamEnabled}
                 onCheckedChange={setEmoteSpamEnabled}
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">View Direction</label>
+              <div className="grid grid-cols-2 gap-2">
+                {['normal', 'right', 'left', 'top', 'bottom'].map((direction) => (
+                  <button
+                    key={direction}
+                    onClick={() => handleViewChange(direction)}
+                    className={`px-3 py-2 text-sm border-2 border-black rounded capitalize
+                      ${viewDirection === direction ? 'bg-black text-white' : 'bg-white text-black'}`}
+                  >
+                    {direction} view
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
