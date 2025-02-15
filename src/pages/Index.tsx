@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
@@ -7,6 +6,7 @@ const Index = () => {
   const [bossTimer, setBossTimer] = useState('');
   const [bossStatus, setBossStatus] = useState('');
   const [showMenu, setShowMenu] = useState(true);
+  const [showBossTimer, setShowBossTimer] = useState(true);
   const [showEnemyLines, setShowEnemyLines] = useState(true);
   const [emoteSpamEnabled, setEmoteSpamEnabled] = useState(false);
   const [enemyLineColor, setEnemyLineColor] = useState('#ffff00');
@@ -96,25 +96,27 @@ const Index = () => {
   return (
     <>
       {/* Boss Timer */}
-      <div className="fixed top-[50px] right-[10px] z-[9999] flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-lg">
-        <img 
-          src="https://cdn1.na.evoworld.io/sprites/bosses/boss1/flying/1.png"
-          alt="Boss"
-          className="w-[50px] h-[50px] mr-4 object-contain"
-        />
-        <div className="flex flex-col">
-          {bossStatus && (
-            <div className="text-lg font-semibold text-red-600">
-              {bossStatus}
-            </div>
-          )}
-          {bossTimer && (
-            <div className="text-lg font-semibold text-gray-800">
-              {bossTimer}
-            </div>
-          )}
+      {showBossTimer && (
+        <div className="fixed top-[50px] right-[10px] z-[9999] flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-lg">
+          <img 
+            src="https://cdn1.na.evoworld.io/sprites/bosses/boss1/flying/1.png"
+            alt="Boss"
+            className="w-[50px] h-[50px] mr-4 object-contain"
+          />
+          <div className="flex flex-col">
+            {bossStatus && (
+              <div className="text-lg font-semibold text-red-600">
+                {bossStatus}
+              </div>
+            )}
+            {bossTimer && (
+              <div className="text-lg font-semibold text-gray-800">
+                {bossTimer}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ESP Mod Menu */}
       {showMenu && (
@@ -122,6 +124,14 @@ const Index = () => {
           <h2 className="text-lg font-bold mb-4">ESP Mod Menu</h2>
           
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Show Boss Timer</label>
+              <Switch 
+                checked={showBossTimer}
+                onCheckedChange={setShowBossTimer}
+              />
+            </div>
+
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Enemy Show</label>
               <Switch 
